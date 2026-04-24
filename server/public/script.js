@@ -28,7 +28,7 @@ async function loadLanguages() {
 async function addLanguage() {
   const name = document.getElementById("langInput").value;
 
-  await fetch(`${API}/languages`, {
+  await fetch("https://slangsite-production.up.railway.app/languages", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({ name })
