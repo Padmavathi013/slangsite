@@ -114,6 +114,30 @@ app.post("/login", async (req, res) => {
 });
 
 
+app.post("/signup", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).send({ message: "Missing fields" });
+    }
+
+    const existing = await User.findOne({ username });
+    if (existing) {
+      return res.status(400).send({ message: "User already exists" });
+    }
+
+    const user = new User({ username, password });
+    await user.save();
+
+    res.send({ message: "Signup successful" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Server error" });
+  }
+});
+
 // 🌍 ADD LANGUAGE (no duplicates)
 app.post("/languages", async (req, res) => {
   const { name } = req.body;

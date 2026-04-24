@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
-<body>
+
 
 <h2>Signup</h2>
 
 <head>
   <link rel="stylesheet" href="style.css">
 </head>
+
+<body>
 
 <input id="username" placeholder="Username"><br><br>
 <input id="password" type="password" placeholder="Password"><br><br>
@@ -18,7 +20,7 @@ async function signup() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  const res = await fetch("slangsite-production.up.railway.app/signup", {
+  const res = await fetch("https://slangsite-production.up.railway.app/signup", {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ username, password })
@@ -32,7 +34,7 @@ async function signup() {
     alert("Signup successful");
 
 // auto login after signup
-  const loginRes = await fetch("slangsite-production.up.railway.app/login", {
+  const loginRes = await fetch("https://slangsite-production.up.railway.app/login", {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ username, password })
@@ -47,6 +49,7 @@ async function signup() {
   window.location.href = "languages.html";
   }
 }
+
 </script>
 
 </body>
