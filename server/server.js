@@ -337,6 +337,55 @@ app.get("/test", (req, res) => {
   res.send("Server working");
 });
 
+app.get("/migrate", async (req, res) => {
+  try {
+    const mongoose = require("mongoose");
+
+    // Connect to OLD DB (test)
+    const oldConn = await mongoose.createConnection(
+      process.env.MONGO_URL.replace("/slangsite", "/test")
+    );
+
+    const OldLanguage = oldConn.model("Language", new mongoose.Schema({
+      name: String,
+      nameLower: String
+    }));
+
+    const OldWord = oldConn.model("Word", new mongoose.Schema({
+      languageId: String,
+      word: String,
+      meaning: String,
+      example: String,
+      region: String,
+      userId: String,
+      username: String
+    }));
+
+    const OldComment = oldConn.model("Comment", new mongoose.Schema({
+      wordId: String,
+      text: String,
+      username: String,
+      createdAt: Date
+    }));
+
+    // Fetch old data
+    const languages = await OldLanguage.find();
+    const words = await OldWord.find();
+    const comments = await OldComment.find();
+
+    // Insert into NEW DB (slangsite)
+    await Language.insertMany(languages);
+    await Word.insertMany(words);
+    await Comment.insertMany(comments);
+
+    res.send("✅ Migration complete");
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Migration failed");
+  }
+});
+
 
 // START SERVER
 app.listen(process.env.PORT || 5000, ()=>console.log("Server running"));
