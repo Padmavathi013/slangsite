@@ -17,29 +17,32 @@
 <button onclick="login()">Login</button>
 
 <script>
+  
 async function login() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  const res = await fetch("/login", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ username, password })
-  });
-
-  let data;
   try {
-    data = await res.json();
-  } catch {
-    data = { message: "No response from server" };
-  }
+    const res = await fetch("https://slangsite-production.up.railway.app/login", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ username, password })
+    });
 
-  if (!res.ok) {
-    alert(data.message);
-  } else {
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Login failed");
+      return;
+    }
+
     localStorage.setItem("token", data.token);
     alert("Login successful");
     window.location.href = "languages.html";
+
+  } catch (err) {
+    console.log(err);
+    alert("Server not reachable");
   }
 }
 </script>
