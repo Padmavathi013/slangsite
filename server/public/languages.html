@@ -22,7 +22,7 @@
 <div id="languageList"></div>
 
 <script>
-const API = "slangsite-production.up.railway.app";
+const API = "https://slangsite-production.up.railway.app";
 
 // ================= AUTH =================
 
@@ -60,7 +60,7 @@ function logout() {
 
 // Load languages
 async function loadLanguages() {
-  const res = await fetch(`${API}/languages`);
+  const res = await fetch("https://slangsite-production.up.railway.app/languages") // hardcoded;
   const data = await res.json();
 
   const list = document.getElementById("languageList");
@@ -82,7 +82,7 @@ async function loadLanguages() {
 
 // Add language
 async function addLanguage() {
-  const name = document.getElementById("languageInput").value;
+  const name = document.getElementById("langInput").value;
 
   try {
     const res = await fetch("https://slangsite-production.up.railway.app/languages", {
