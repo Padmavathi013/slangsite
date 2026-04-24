@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Languages</title>
+</head>
+
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- ✅ Auth section -->
+<div id="authSection"></div>
+<hr>
+
+<h1>Languages</h1>
+
+<input id="langInput" placeholder="Add language">
+<button onclick="addLanguage()">Add</button>
+
+<div id="languageList"></div>
+
+<script>
+const API = "http://localhost:5000";
+
+// ================= AUTH =================
+
+function loadAuth() {
+  const authDiv = document.getElementById("authSection");
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    authDiv.innerHTML = `
+      <button onclick="logout()">Logout</button>
+    `;
+  } else {
+    authDiv.innerHTML = `
+      <button onclick="goLogin()">Login</button>
+      <button onclick="goSignup()">Signup</button>
+    `;
+  }
+}
+
+function goLogin() {
+  window.location.href = "login.html";
+}
+
+function goSignup() {
+  window.location.href = "signup.html";
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  alert("Logged out");
+  location.reload();
+}
+
+// ================= LANGUAGES =================
+
+// Load languages
+async function loadLanguages() {
+  const res = await fetch(`${API}/languages`);
+  const data = await res.json();
+
+  const list = document.getElementById("languageList");
+  list.innerHTML = "";
+
+  data.forEach(lang => {
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <h3 onclick="openLanguage('${lang._id}')"
+          style="cursor:pointer; color:blue;">
+        ${lang.name}
+      </h3>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+// Add language
+async function addLanguage() {
+  const name = document.getElementById("langInput").value;
+
+  const res = await fetch(`${API}/languages`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ name })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.message);
+  } else {
+    document.getElementById("langInput").value = "";
+    loadLanguages();
+  }
+}
+
+// Navigate to words page
+function openLanguage(id) {
+  window.location.href = `words.html?langId=${id}`;
+}
+
+
+
+// ================= INIT =================
+
+loadAuth();      // ✅ important
+loadLanguages();
+
+</script>
+
+</body>
+</html>

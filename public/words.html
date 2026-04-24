@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Words</title>
+</head>
+<body>
+
+<h1>Words</h1>
+
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<button onclick="goBack()">⬅ Back</button>
+
+<h3>Add Word</h3>
+<input id="wordInput" placeholder="Word">
+<input id="meaningInput" placeholder="Meaning">
+<input id="exampleInput" placeholder="Example">
+<input id="regionInput" placeholder="Region">
+<button onclick="addWord()">Add</button>
+
+<input id="searchInput" oninput="filterWords()" placeholder="Search slang...">
+<div id="wordsContainer"></div>
+
+
+<script>
+function getCurrentUser() {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.username;
+  } catch {
+    return null;
+  }
+}
+
+const API = "http://localhost:5000";
+
+// Get language ID from URL
+const params = new URLSearchParams(window.location.search);
+const languageId = params.get("langId");
+
+// Go back
+function goBack() {
+  window.location.href = "index.html";
+}
+
+
+// ✅ ADD WORD (FIXED: now sends token)
+async function addWord() {
+  const word = document.getElementById("wordInput").value;
+  const meaning = document.getElementById("meaningInput").value;
+  const example = document.getElementById("exampleInput").value;
+  const region = document.getElementById("regionInput").value;
+  if (!word || !meaning || !example) {
+    alert("Fill all fields");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/words`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization": token   // ✅ IMPORTANT
+    },
+    body: JSON.stringify({ languageId, word, meaning, example, region })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.message);
+  } else {
+    // clear inputs
+    document.getElementById("wordInput").value = "";
+    document.getElementById("meaningInput").value = "";
+    document.getElementById("exampleInput").value = "";
+
+    loadWords();
+  }
+}
+
+// LOAD WORDS
+async function loadWords() {
+  const res = await fetch(`${API}/words/${languageId}`);
+  allWords = await res.json();  // ✅ save globally
+
+  displayWords(allWords);
+}
+
+function displayWords(words) {
+  const container = document.getElementById("wordsContainer");
+  container.innerHTML = "";
+
+  words.forEach(w => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <h3>${w.word}</h3>
+      <p>By: ${w.username}</p>
+      <p class="meaning">${w.meaning}</p>
+      <p class="example">${w.example}</p>
+      <p style="color: gray; font-size: 14px;">🌍 ${w.region || "Unknown"}</p>
+      ${(getCurrentUser() === w.username || getCurrentUser() === "admin") ? 
+        `<button onclick="deleteWord('${w._id}')">Delete</button>` : ""}
+      <div id="comments-${w._id}"></div>
+      <input id="commentInput-${w._id}" placeholder="comment">
+      <button onclick="addComment('${w._id}')">Post</button>
+      <hr>
+    `;
+    container.appendChild(div);
+    loadComments(w._id);
+  });
+}
+
+function filterWords() {
+  const query = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = allWords.filter(w =>
+    w.word.toLowerCase().includes(query) ||
+    w.meaning.toLowerCase().includes(query) ||
+    (w.example && w.example.toLowerCase().includes(query))
+  );
+  displayWords(filtered);
+}
+
+// DELETE WORD
+async function deleteWord(id) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Login required");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const res = await fetch(`${API}/words/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": token
+    }
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.message);
+  } else {
+    loadWords();
+  }
+}
+
+// ADD COMMENT
+async function addComment(wordId) {
+  const text = document.getElementById(`commentInput-${wordId}`).value;
+  const token = localStorage.getItem("token");
+
+  await fetch(`${API}/comments`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization": token   // ✅ IMPORTANT
+    },
+    body: JSON.stringify({ wordId, text })
+  });
+
+  loadComments(wordId);
+}
+
+// LOAD COMMENTS
+async function loadComments(wordId) {
+  const res = await fetch(`${API}/comments/${wordId}`);
+  const comments = await res.json();
+
+  const div = document.getElementById(`comments-${wordId}`);
+  div.innerHTML = "";
+
+  comments.forEach(c => {
+    console.log("COMMENT OBJECT:", c); // 👈 ADD THIS to see what's in c
+
+    const currentUser = getCurrentUser();
+
+    const commentDiv = document.createElement("div");
+
+    const p = document.createElement("p");
+    p.textContent = `${c.username || "User"}: ${c.text}`;
+    commentDiv.appendChild(p);
+
+    if (currentUser === c.username || currentUser === "admin") {
+      const btn = document.createElement("button");
+      btn.textContent = "Delete";
+
+      btn.onclick = function () {
+        if (!c._id) {                          // 👈 GUARD STARTS HERE
+          console.error("No comment ID!", c);
+          return;
+        }                                      // 👈 GUARD ENDS HERE
+        console.log("Delete clicked:", c._id);
+        deleteComment(c._id, wordId);
+      };
+
+      commentDiv.appendChild(btn);
+    }
+
+    div.appendChild(commentDiv);
+  });
+}
+
+//DELETE COMMENT
+
+async function deleteComment(commentId, wordId) {
+  const token = localStorage.getItem("token");
+  console.log("Delete clicked:", commentId);
+
+  const res = await fetch(`${API}/comments/${commentId}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": token
+    }
+  });
+
+  // ✅ Guard against HTML error pages breaking .json()
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    console.error("Server returned non-JSON:", text);
+    alert("Something went wrong");
+    return;
+  }
+
+  if (!res.ok) {
+    alert(data.message);
+  } else {
+    loadComments(wordId);
+  }
+}
+
+
+loadWords();
+
+
+</script>
+
+
+</body>
+</html>

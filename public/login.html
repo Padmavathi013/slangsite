@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Admin Login</h2>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<script>
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("/login", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ username, password })
+  });
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    data = { message: "No response from server" };
+  }
+
+  if (!res.ok) {
+    alert(data.message);
+  } else {
+    localStorage.setItem("token", data.token);
+    alert("Login successful");
+    window.location.href = "index.html";
+  }
+}
+</script>
+
+</div>
+
+</body>
+</html>

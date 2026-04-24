@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Signup</h2>
+
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<input id="username" placeholder="Username"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
+
+<button onclick="signup()">Signup</button>
+
+<script>
+async function signup() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("http://localhost:5000/signup", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.message);
+  } else {
+    alert("Signup successful");
+
+// auto login after signup
+  const loginRes = await fetch("http://localhost:5000/login", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ username, password })
+  });
+
+  const loginData = await loginRes.json();
+
+  // save token
+  localStorage.setItem("token", loginData.token);
+
+  // go to homepage
+  window.location.href = "index.html";
+  }
+}
+</script>
+
+</body>
+</html>
