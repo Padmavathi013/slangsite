@@ -18,7 +18,7 @@ async function signup() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  const res = await fetch("http://localhost:5000/signup", {
+  const res = await fetch("slangsite-production.up.railway.app/signup", {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ username, password })
@@ -32,7 +32,7 @@ async function signup() {
     alert("Signup successful");
 
 // auto login after signup
-  const loginRes = await fetch("http://localhost:5000/login", {
+  const loginRes = await fetch("slangsite-production.up.railway.app/login", {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ username, password })
