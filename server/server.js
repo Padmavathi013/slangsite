@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ THEN static files
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 const SECRET = process.env.JWT_SECRET;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
