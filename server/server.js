@@ -20,10 +20,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 console.log("MONGO URL:", process.env.MONGO_URL);
 
-mongoose.connect(process.env.MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URL)
 .then(() => {
   console.log("✅ DB Connected");
 
