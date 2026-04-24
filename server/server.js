@@ -18,18 +18,24 @@ const SECRET = process.env.JWT_SECRET;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log("✅ DB Connected");
+console.log("MONGO URL:", process.env.MONGO_URL);
 
-    app.listen(process.env.PORT || 5000, () => {
-      console.log("🚀 Server running");
-    });
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => {
+  console.log("✅ DB Connected");
 
-  })
-  .catch(err => {
-    console.log("❌ DB Connection Failed:", err);
+  app.listen(process.env.PORT || 5000, () => {
+    console.log("🚀 Server running");
   });
+})
+.catch(err => {
+  console.log("❌ DB Connection Failed:", err.message);
+});
+
+
 
 // ================= MODELS =================
 
