@@ -82,23 +82,32 @@ async function loadLanguages() {
 
 // Add language
 async function addLanguage() {
-  const name = document.getElementById("langInput").value;
+  const name = document.getElementById("languageInput").value;
 
-  const res = await fetch(`${API}/languages`, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ name })
-  });
+  try {
+    const res = await fetch("https://slangsite-production.up.railway.app/languages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) {
-    alert(data.message);
-  } else {
-    document.getElementById("langInput").value = "";
-    loadLanguages();
+    if (!res.ok) {
+      alert(data.message);
+    } else {
+      alert("Language added");
+      location.reload();
+    }
+
+  } catch (err) {
+    console.log(err);
+    alert("Request failed");
   }
 }
+
 
 // Navigate to words page
 function openLanguage(id) {
