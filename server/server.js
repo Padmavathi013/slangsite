@@ -333,7 +333,7 @@ app.delete("/comments/:id", async (req, res) => {
 });
 
 
-app.get("/test", (req, res) => {
+app.get("/slangDB", (req, res) => {
   res.send("Server working");
 });
 
