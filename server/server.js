@@ -59,7 +59,7 @@ const Comment = mongoose.model("Comment", {
 // ================= ROUTES =================
 
 app.get("/", (req,res)=>{
-  res.sendFile(path.join(__dirname, "../public/welcome.html"));
+  res.sendFile(path.join(__dirname, "public/welcome.html"));
 });
 
 // 🔐 SIGNUP
