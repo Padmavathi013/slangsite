@@ -37,7 +37,7 @@ function getCurrentUser() {
   }
 }
 
-const API = "slangsite-production.up.railway.app";
+const API = "https://slangsite-production.up.railway.app";
 
 // Get language ID from URL
 const params = new URLSearchParams(window.location.search);
@@ -55,6 +55,7 @@ async function addWord() {
   const meaning = document.getElementById("meaningInput").value;
   const example = document.getElementById("exampleInput").value;
   const region = document.getElementById("regionInput").value;
+
   if (!word || !meaning || !example) {
     alert("Fill all fields");
     return;
@@ -62,26 +63,47 @@ async function addWord() {
 
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API}/words`, {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Authorization": token   // ✅ IMPORTANT
-    },
-    body: JSON.stringify({ languageId, word, meaning, example, region })
-  });
+  if (!token) {
+    alert("Login required");
+    window.location.href = "login.html";
+    return;
+  }
 
-  const data = await res.json();
+  try {
+    const res = await fetch(`${API}/words`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": token
+      },
+      body: JSON.stringify({ languageId, word, meaning, example, region })
+    });
 
-  if (!res.ok) {
-    alert(data.message);
-  } else {
-    // clear inputs
-    document.getElementById("wordInput").value = "";
-    document.getElementById("meaningInput").value = "";
-    document.getElementById("exampleInput").value = "";
+    const text = await res.text();   // 👈 safer
+    let data;
 
-    loadWords();
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.error("Non-JSON response:", text);
+      alert("Server error");
+      return;
+    }
+
+    if (!res.ok) {
+      alert(data.message);
+    } else {
+      document.getElementById("wordInput").value = "";
+      document.getElementById("meaningInput").value = "";
+      document.getElementById("exampleInput").value = "";
+      document.getElementById("regionInput").value = "";
+
+      loadWords();
+    }
+
+  } catch (err) {
+    console.log(err);
+    alert("Request failed");
   }
 }
 
