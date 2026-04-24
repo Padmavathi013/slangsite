@@ -20,14 +20,15 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 mongoose.connect(process.env.MONGO_URL)
   .then(() => {
-    console.log("DB Connected");
+    console.log("✅ DB Connected");
 
-    app.listen(process.env.PORT || 5000, () =>
-      console.log("Server running")
-    );
+    app.listen(process.env.PORT || 5000, () => {
+      console.log("🚀 Server running");
+    });
+
   })
   .catch(err => {
-    console.log("DB Connection Failed:", err);
+    console.log("❌ DB Connection Failed:", err);
   });
 
 // ================= MODELS =================
