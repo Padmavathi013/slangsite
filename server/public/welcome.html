@@ -75,7 +75,7 @@
   <h1 class="welcome-title" id="title">SlangCube</h1>
   <button class="start-btn" id="startBtn" onclick="start()">Get Started</button>
 </div>
-
+const isMobile = window.innerWidth < 768;
 <script>
 const canvas = document.getElementById("leafCanvas");
 const ctx = canvas.getContext("2d");
@@ -88,6 +88,7 @@ leafImg.src = "images/leaf.png";
 
 const leaves = [];
 const LEAF_COUNT = 100;
+const LEAF_COUNT = isMobile ? 20 : 100;
 let animationDone = false;
 
 function randomBetween(a, b) {
@@ -100,7 +101,7 @@ leafImg.onload = () => {
       x: randomBetween(0, canvas.width),
       y: randomBetween(-canvas.height * 1.5, -30),
       size: randomBetween(60, 120),
-      speedY: randomBetween(window.innerWidth < 768 ? 5 : 1.5, window.innerWidth < 768 ? 9 : 3.5),
+      speedY: randomBetween(isMobile ? 8 : 1.5, isMobile ? 14 : 3.5),
       speedX: randomBetween(-0.8, 0.8),
       rotation: randomBetween(0, Math.PI * 2),
       rotSpeed: randomBetween(-0.02, 0.02),
