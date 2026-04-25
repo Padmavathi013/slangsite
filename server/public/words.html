@@ -117,8 +117,16 @@ async function addWord() {
   }
 }
 
+let lastFocused = null;
+
+document.addEventListener("focusin", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+    lastFocused = e.target;
+  }
+});
+
 function insertChar(char) {
-  const input = document.getElementById("wordInput");
+  const input = lastFocused || document.getElementById("wordInput");
   const start = input.selectionStart;
   const end = input.selectionEnd;
   input.value = input.value.slice(0, start) + char + input.value.slice(end);
