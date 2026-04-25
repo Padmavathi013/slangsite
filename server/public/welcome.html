@@ -1,29 +1,167 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Welcome</title>
   <link rel="stylesheet" href="style.css">
-</head>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    body {
+      overflow: hidden;
+      height: 100vh;
+      background: linear-gradient(135deg, #8d8e6f);
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    .welcome-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .welcome-title {
+      font-size: 60px;
+      font-family: 'Georgia', serif;
+      font-weight: bold;
+      color: #333;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .welcome-title.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .start-btn {
+      padding: 12px 25px;
+      font-size: 18px;
+      background: #612a3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 30px;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s;
+    }
+
+    .start-btn.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .start-btn:hover {
+      background: #7a3349;
+    }
+  </style>
+</head>
 <body>
 
+<canvas id="leafCanvas"></canvas>
 
 <div class="welcome-container">
-  <div class="title-row">
-    <img src="images/leaf.png" class="leaf leaf-left">
-    <h1 class="welcome-title">SlangCube</h1>
-    <img src="images/leaf.png" class="leaf leaf-right">
-  </div>
-
-  <button onclick="start()" class="start-btn">
-    Get Started
-  </button>
+  <h1 class="welcome-title" id="title">SlangSphere</h1>
+  <button class="start-btn" id="startBtn" onclick="start()">Get Started</button>
 </div>
 
 <script>
+const canvas = document.getElementById("leafCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const leafImg = new Image();
+leafImg.src = "images/leaf.png";
+
+const leaves = [];
+const LEAF_COUNT = 35;
+let animationDone = false;
+
+function randomBetween(a, b) {
+  return a + Math.random() * (b - a);
+}
+
+leafImg.onload = () => {
+  for (let i = 0; i < LEAF_COUNT; i++) {
+    leaves.push({
+      x: randomBetween(0, canvas.width),
+      y: randomBetween(-canvas.height * 1.5, -30),
+      size: randomBetween(30, 70),
+      speedY: randomBetween(1.5, 3.5),
+      speedX: randomBetween(-0.8, 0.8),
+      rotation: randomBetween(0, Math.PI * 2),
+      rotSpeed: randomBetween(-0.02, 0.02),
+      opacity: 1,
+      settled: false,
+      settledY: 0
+    });
+  }
+  animate();
+};
+
+const floorY = canvas.height - 40;
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let allSettled = true;
+
+  for (let leaf of leaves) {
+    if (!leaf.settled) {
+      leaf.y += leaf.speedY;
+      leaf.x += leaf.speedX;
+      leaf.rotation += leaf.rotSpeed;
+
+      if (leaf.y >= floorY) {
+        leaf.y = floorY;
+        leaf.settled = true;
+        leaf.settledY = floorY;
+      } else {
+        allSettled = false;
+      }
+    }
+
+    ctx.save();
+    ctx.globalAlpha = leaf.opacity;
+    ctx.translate(leaf.x, leaf.y);
+    ctx.rotate(leaf.rotation);
+    ctx.drawImage(leafImg, -leaf.size / 2, -leaf.size / 2, leaf.size, leaf.size);
+    ctx.restore();
+  }
+
+  if (allSettled && !animationDone) {
+    animationDone = true;
+    showUI();
+  }
+
+  if (!animationDone) {
+    requestAnimationFrame(animate);
+  }
+}
+
+function showUI() {
+  document.getElementById("title").classList.add("show");
+  setTimeout(() => {
+    document.getElementById("startBtn").classList.add("show");
+  }, 600);
+}
+
 function start() {
-  window.location.href = "languages.html"; // or signup.html if you prefer
+  window.location.href = "languages.html";
 }
 </script>
 
