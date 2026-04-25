@@ -20,6 +20,16 @@
 <input id="regionInput" placeholder="Region">
 <button onclick="addWord()">Add</button>
 
+<div id="specialChars" style="margin: 4px 0 8px 0;">
+  <button type="button" onclick="insertChar('ä')">ä</button>
+  <button type="button" onclick="insertChar('ö')">ö</button>
+  <button type="button" onclick="insertChar('ü')">ü</button>
+  <button type="button" onclick="insertChar('Ä')">Ä</button>
+  <button type="button" onclick="insertChar('Ö')">Ö</button>
+  <button type="button" onclick="insertChar('Ü')">Ü</button>
+  <button type="button" onclick="insertChar('ß')">ß</button>
+</div>
+
 <input id="searchInput" oninput="filterWords()" placeholder="Search slang...">
 <div id="wordsContainer"></div>
 
@@ -105,6 +115,15 @@ async function addWord() {
     console.log(err);
     alert("Request failed");
   }
+}
+
+function insertChar(char) {
+  const input = document.getElementById("wordInput");
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  input.value = input.value.slice(0, start) + char + input.value.slice(end);
+  input.selectionStart = input.selectionEnd = start + 1;
+  input.focus();
 }
 
 // LOAD WORDS
