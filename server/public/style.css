@@ -11,6 +11,7 @@ h1 {
 input {
   margin: 5px;
   padding: 8px;
+  border-radius: 6px;
 }
 
 button {
