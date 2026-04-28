@@ -149,18 +149,18 @@ function displayWords(words) {
   words.forEach(w => {
     const div = document.createElement("div");
     div.innerHTML = `
-      <h3>${w.word}</h3>
-      <p>By: ${w.username}</p>
-      <p class="meaning">${w.meaning}</p>
-      <p class="example">${w.example}</p>
-      <p style="color: gray; font-size: 14px;">🌍 ${w.region || "Unknown"}</p>
-      ${(getCurrentUser() === w.username || getCurrentUser() === "admin") ? 
-        `<button onclick="deleteWord('${w._id}')">Delete</button>` : ""}
-      <div id="comments-${w._id}"></div>
-      <input id="commentInput-${w._id}" placeholder="comment">
-      <button onclick="addComment('${w._id}')">Post</button>
-      <hr>
-    `;
+    <p style="font-size: 12px; color: #666; margin-bottom: 2px;">added by ${w.username}</p>
+    <h3>${w.word}</h3>
+    <p class="meaning">${w.meaning}</p>
+    <p class="example">${w.example}</p>
+    <p style="color: gray; font-size: 14px;">🌍 ${w.region || "Unknown"}</p>
+    ${(getCurrentUser() === w.username || getCurrentUser() === "admin") ? 
+      `<button onclick="deleteWord('${w._id}')">Delete</button>` : ""}
+    <div id="comments-${w._id}"></div>
+    <input id="commentInput-${w._id}" placeholder="comment">
+    <button onclick="addComment('${w._id}')">Post</button>
+    <hr>
+  `;
     container.appendChild(div);
     loadComments(w._id);
   });
