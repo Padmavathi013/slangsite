@@ -216,6 +216,7 @@ async function addComment(wordId) {
     body: JSON.stringify({ wordId, text })
   });
 
+  document.getElementById(`commentInput-${wordId}`).value = "";
   loadComments(wordId);
 }
 
